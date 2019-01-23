@@ -17,15 +17,30 @@ app.get('/', (req, res)  => res.send('Hello World!'));
 
 // POST /users
 app.post('/users', (req, res) => {
-    let body = _.pick(req.body, ['email', 'security.question', 'security.password']);
+    let body = _.pick(req.body, ['email', 'security.question', 'security.answer']);
     let user = new User(body);
-    
+
     user.save().then(() => {
         return user.generateAuthToken();
     }).then((token) => {
         res.header('x-auth', token).send(user);
     }).catch((e) => {
         res.status(400).send(e);
+    })
+})
+
+// LOGIN
+app.post('/users/login', (req, res) => {
+    let body = _.pick(req.body, ['email', 'security.answer']);
+
+    User.findByCredentials(body.email, body.security.answer)
+        .then((user) => {
+            return user.generateAuthToken().then((token) => {
+                res.header('x-auth', token).send(user);
+            })
+    }).catch((e) => {
+        console.log(e);
+        res.status(400).send('Wrong user/answer combination');
     })
 })
 

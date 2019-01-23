@@ -22,7 +22,7 @@ const UserSchema = new mongoose.Schema({
             required: true,
             minlength: 4,
         },
-        password: {
+        answer: {
             type: String,
             required: true,
             minlength: 1
@@ -65,16 +65,37 @@ UserSchema.methods.generateAuthToken = function () {
     });
 };
 
+UserSchema.statics.findByCredentials = function (email, answer) {
+    answer = answer.toLowerCase();
+    
+    return User.findOne({email})
+        .then((user) => {
+            if(!user) {
+                return Promise.reject();
+            }
+
+            return new Promise((resolve, reject) => {
+                bcrypt.compare(answer, user.security.answer, (error, result) => {
+                    if(result === true) {
+                        resolve(user);
+                    } else {
+                        reject();
+                    }
+                })
+            })
+        })
+}
+
 UserSchema.pre('save', function (next) {
     let user = this;
 
-    if (user.isModified('security.password')) {
+    if (user.isModified('security.answer')) {
         
-        let pwd = user.security.password.toLowerCase();
+        let pwd = user.security.answer.toLowerCase();
 
         bcrypt.genSalt(10, (err, salt) => {
             bcrypt.hash(pwd, salt, (err, hash) => {
-                user.security.password = hash;
+                user.security.answer = hash;
                 next();
             });
         })

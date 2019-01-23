@@ -11,7 +11,7 @@ const users = [{
     email: 'l@example.com',
     security: {
         question: 'Name of first pet?',
-        password: 'Wilfred',
+        answer: 'Wilfred',
     },
     tokens: [{
         access: 'auth',
@@ -22,7 +22,7 @@ const users = [{
     email: 'jen@example.com',
     security: {
         question: 'Name of first school?',
-        password: 'LSE',
+        answer: 'LSE',
     },
     tokens: [{
         access: 'auth',
