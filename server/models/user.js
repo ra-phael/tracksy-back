@@ -65,9 +65,37 @@ UserSchema.methods.generateAuthToken = function () {
     });
 };
 
+UserSchema.methods.removeToken = function (token) {
+    let user = this;
+
+    return user.update({
+        $pull: {
+            tokens: {token}
+        }
+    });
+};
+
+UserSchema.statics.findByToken = function (token) {
+    const User = this;
+    let decoded;
+
+    try {
+        decoded = jwt.verify(token, process.env.JWT_SECRET);
+    } catch (e) {
+        return Promise.reject();
+    }
+    console.log(decoded);
+    return User.findOne({
+        '_id': decoded._id,
+        'tokens.token': token,
+        'tokens.access': 'auth'
+    });
+
+};
+
 UserSchema.statics.findByCredentials = function (email, answer) {
     answer = answer.toLowerCase();
-    
+
     return User.findOne({email})
         .then((user) => {
             if(!user) {
