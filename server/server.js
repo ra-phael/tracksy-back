@@ -4,8 +4,9 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const _ = require('lodash');
 const cors = require('cors');
-
 const { mongoose } = require('./db/mongoose');
+const ObjectId = mongoose.Types.ObjectId;
+
 const { User } = require('./models/user');
 const { Item } = require('./models/item');
 const corsWhitelist = ['http://localhost:3000','localhost:8080', '127.0.0.1:49987']
@@ -98,6 +99,23 @@ app.get('/users/question', (req, res) => {
         }).catch(e => {
             res.status(400).send(e);
         })
+})
+
+// PATCH Update WatchedItems
+app.patch('/users/watcheditems', authenticate, (req, res) => {
+    let body = _.pick(req.body, ['item']);
+    
+    if (!ObjectId.isValid(body.item)) {
+        res.status(404).send('Invalid id');
+    }
+
+    req.user.updateWatchedItems(body.item).then((user) => {
+        console.log("user after update", user);
+        res.status(200).send(user);
+    }, () => {
+        res.status(400).send('An error occured while trying to update watched items');
+    })
+
 })
 
 
