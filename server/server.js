@@ -111,7 +111,7 @@ app.get('/users/question', (req, res) => {
 app.patch('/users/watcheditems', authenticate, (req, res) => {
     let body = _.pick(req.body, ['item']);
 
-    if (!ObjectId.isValid(body.item)) {
+    if (!ObjectId.isValid(body.item._id)) {
         res.status(404).send('Invalid id');
     }
 

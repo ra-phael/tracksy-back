@@ -26,6 +26,9 @@ const ItemSchema = new mongoose.Schema({
     category: {
         type: String,
         required: true,
+    },
+    dollarPriceThreshold: {
+        type: Number
     }
 })
 

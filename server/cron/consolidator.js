@@ -6,6 +6,17 @@ const { User } = require('../models/user');
 const { Item } = require('../models/item');
 const { sendListings } = require('../email/emailService')
 
+const getBaseThresholds = () => {
+    return new Promise((resolve, reject) => {
+         Item.find({})
+            .then(items => resolve(items
+                .reduce((obj, item) => (
+                    obj[item.handle] = item.dollarPriceThreshold,
+                    obj
+                ), {})
+            ))
+    })
+}
 
 const processNewListings = (newListings) => {
     let freshScrape = new ScrapedListing(newListings);
@@ -18,26 +29,51 @@ const processNewListings = (newListings) => {
     console.log("Saved fresh listings in DB");
 }
 
+const filterItem = (item, watchedItem, thresholds) => {
+    let priceThreshold = watchedItem.hasOwnProperty('priceThreshold') 
+        ? watchedItem.priceThreshold : thresholds[item.handle]
+    console.log("price thresh", priceThreshold);
+    let filteredListings = item.listings
+        .filter(listing => {
+            return Number(listing.price) < priceThreshold
+        })
+    let filteredItem = Object.assign(item._doc, {listings: filteredListings});
 
-const prepareDailyDeals = (newScrape) => {
+    return filteredItem
+}
+
+const mainConsolidator = (newScrape, baseThresholds) => {
     User.find({})
         .then(users => { 
             users.forEach(user => {
-                let listingsToSend = [];
+                let itemsToSend = [];
+                
                 newScrape.scraped.forEach(item => {
                     let itemId = new ObjectId(item._id)
-                    // console.log(user.watchedItems.some(id => id.equals(itemId)));
-                    if(user.watchedItems.some(id => id.equals(itemId))) {
+
+                    let matchingWatchedItem = user.watchedItems
+                    .filter(obj => obj._id.equals(itemId));
+                    matchingWatchedItem = matchingWatchedItem[0];
+                    console.log("Matching item", matchingWatchedItem);
+
+                    if(matchingWatchedItem) {
                         // console.log(`New ${item.name} for ${user.email}`);
-                        listingsToSend.push(item)
+                        itemsToSend.push(filterItem(item, matchingWatchedItem, baseThresholds))
                     }
                 });
-                sendListings(user, listingsToSend);
+                sendListings(user, itemsToSend);
                 // console.log("Listings to send: ", listingsToSend);
             })
             
         })
-        .catch(e => console.log("[Prepare daily deals] :", e))
+        .catch(e => console.log("[mainConsolidator] :", e))
+}
+
+const prepareDailyDeals = (newScrape) => {
+    getBaseThresholds().then(baseThresholds => {
+        console.log("thresholds:", baseThresholds);
+        mainConsolidator(newScrape, baseThresholds)
+    })
 }
 
 module.exports = { processNewListings, prepareDailyDeals };

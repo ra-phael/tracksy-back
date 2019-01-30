@@ -18,7 +18,17 @@ const UserSchema = new mongoose.Schema({
         }
     },
     watchedItems: [{
-        type: ObjectId
+        _id:{
+            type: ObjectId
+        },
+        priceThreshold: {
+            price: {
+                type: Number
+            },
+            currency: {
+                type: String
+            }
+        }
     }],
     security: {
         question: {
@@ -54,7 +64,7 @@ UserSchema.methods.toJSON = function () {
 
 UserSchema.methods.updateWatchedItems = function(item) {
     let user = this;
-    let itemIndex = _.find(user.watchedItems, el => el == item);
+    let itemIndex = _.find(user.watchedItems, el => el._id == item._id);
 
     if(itemIndex != undefined) {
         console.log("Removing already watched item", item);
@@ -62,7 +72,7 @@ UserSchema.methods.updateWatchedItems = function(item) {
             _id: user._id
         },{
             $pull: {
-                watchedItems: item
+                watchedItems: { _id: item._id }
             }
         }, {new: true}).then(user => user)
     } else {
@@ -71,7 +81,7 @@ UserSchema.methods.updateWatchedItems = function(item) {
             _id: user._id
         },{
             $addToSet: {
-                watchedItems: item
+                watchedItems: { _id: item._id }
             }
         }, {new: true}).then(user => user)
     }
