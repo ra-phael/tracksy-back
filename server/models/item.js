@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const validator = require('validator');
 
 const ItemSchema = new mongoose.Schema({
     brandDisplayName: {
@@ -13,6 +12,16 @@ const ItemSchema = new mongoose.Schema({
     name: {
         type: String,
         required: true,
+    },
+    handle: {
+        type: String,
+        required: true,
+    },
+    lastListing: {
+        type: Number
+    },
+    lastScrape: {
+        type: Date
     },
     category: {
         type: String,
