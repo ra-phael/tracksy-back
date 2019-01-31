@@ -3,9 +3,8 @@ const { pingCall, fetchNewListings } = require('./racleur');
 const { ScrapedListing } = require('../models/scrapedListing');
 const { processNewListings, prepareDailyDeals } = require('./consolidator')
 
-// new cron.CronJob('0 */35 * * * *',
-const dailyFetch = () => {
-    console.log("## Running daily cron job ###");
+const dailyFetch = new cron.CronJob('0 30 11 * * *', () => {
+    console.log("## Running daily fetch job ###");
     
     pingCall()
         .then(statusCode => {
@@ -15,17 +14,16 @@ const dailyFetch = () => {
                     .catch(error => console.log(error));
             }
         });
-}
+})
 
-
-const dailyDispatch = () => {
-    // Get the latest
+const dailyDispatch = new cron.CronJob('0 45 11 * * *', () => {
+    // Get the latest scrape
     ScrapedListing.findOne().sort({ "_id": -1 })
         .exec(function(err, doc) { 
             // console.log("Latest scrape:", doc);
             if(err) return err;
             prepareDailyDeals(doc);
          });
-}
+})
 
 module.exports = { dailyFetch, dailyDispatch };

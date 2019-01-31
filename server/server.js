@@ -15,8 +15,8 @@ const { authenticate } = require('./middleware/authenticate');
 const { TEST_ITEMS } = require('./db/testdata')
 const { testSend } = require('./email/emailService')
 
-dailyDispatch();
-// testSend();
+dailyFetch.start();
+dailyDispatch.start();
 
 const app = express();
 

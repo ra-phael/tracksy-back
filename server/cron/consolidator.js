@@ -61,8 +61,10 @@ const mainConsolidator = (newScrape, baseThresholds) => {
                         itemsToSend.push(filterItem(item, matchingWatchedItem, baseThresholds))
                     }
                 });
-                sendListings(user, itemsToSend);
-                // console.log("Listings to send: ", listingsToSend);
+                if(itemsToSend && itemsToSend.length) {
+                    console.log("Items to send: ", itemsToSend);
+                    sendListings(user, itemsToSend);
+                }
             })
             
         })
