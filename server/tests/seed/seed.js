@@ -16,7 +16,15 @@ const users = [{
     tokens: [{
         access: 'auth',
         token: jwt.sign({_id: userOneId, access: 'auth'}, process.env.JWT_SECRET).toString()
-    }]
+    }],
+    watchedItems : [ 
+        {
+            "_id" : ObjectID("5c4f39afdb2a213a78692e94")
+        }, 
+        {
+            "_id" : ObjectID("5c4f39afdb2a213a78692e95")
+        }
+    ]
 }, {
     _id: userTwoId,
     email: 'jen@example.com',

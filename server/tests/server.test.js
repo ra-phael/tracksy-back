@@ -14,7 +14,7 @@ describe('GET /', () => {
         request(app)
         .get('/')
         .then((res) => {
-            console.log(res);
+            expect(res.status == 200);
         })
     })
 })
@@ -48,6 +48,28 @@ describe('POST /users', () => {
                     done();
                 }).catch((e) => done(e));
             });
+    });
+
+    it('should return validation errors if request is invalid', (done) => {
+        request(app)
+            .post('/users')
+            .send({
+                email: 'email@sth.com',
+                security: {question: ' ', answer: 'answer'}
+            })
+            .expect(400)
+            .end(done);
+    });
+
+    it('should not create user if email already used', (done) => {
+        request(app)
+        .post('/users')
+        .send({
+            email: users[0].email,
+            password: 'whatever'
+        })
+        .expect(400)
+        .end(done);
     });
 
 })
@@ -107,3 +129,33 @@ describe('POST /users/login', () => {
     });
 
 })
+
+
+describe('PATCH /users/watcheditems', () => {
+    it('should return a validation error with invalid IDs', (done) => {
+        request(app)
+            .patch('/users/watcheditems')
+            .set('x-auth', users[0].tokens[0].token)
+            .send({
+                item: { _id: "a" }
+            })
+            .expect(400)
+            .end((err, res) => {
+                if (err) {
+                    return done(err);
+                }
+
+                User.findById(users[0]._id).then((user) => {
+                    expect(user.watchedItems.length).toBe(2);
+
+                    done();
+                }).catch((e) => done(e));
+            })
+    });
+
+})
+
+
+
+
+

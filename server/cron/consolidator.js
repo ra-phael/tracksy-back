@@ -21,6 +21,8 @@ const getBaseThresholds = () => {
 const processNewListings = (newListings) => {
     let freshScrape = new ScrapedListing(newListings);
     freshScrape.save()
+
+    // Update lastListing in Item collection
     newListings.scraped.forEach(item => {
         Item.findByIdAndUpdate( item._id, { $set: { lastListing: item.lastListing }}, (err, el) => {
             if(err) console.log("Error while updating Item", err);
@@ -30,13 +32,15 @@ const processNewListings = (newListings) => {
 }
 
 const filterItem = (item, watchedItem, thresholds) => {
+    // Set user defined price threshold *if any* or base price threshold if not
     let priceThreshold = watchedItem.hasOwnProperty('priceThreshold') 
         ? watchedItem.priceThreshold : thresholds[item.handle]
-    console.log("price thresh", priceThreshold);
+
     let filteredListings = item.listings
         .filter(listing => {
             return Number(listing.price) < priceThreshold
         })
+        
     let filteredItem = Object.assign(item._doc, {listings: filteredListings});
 
     return filteredItem

@@ -1,4 +1,3 @@
-
 const axios = require('axios');
 const { Item } = require('../models/item');
 
@@ -12,7 +11,7 @@ const instance = axios.create({
 
 const pingCall = () => {
     return instance.get('/ping')
-        .then( res => res.status)
+        .then( res => res.status )
         .catch( e => console.log('Racleur ping error:', e))
 }
 

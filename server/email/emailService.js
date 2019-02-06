@@ -12,7 +12,7 @@ const makeEmail = (body) => ({
   html: body,
 });
 
-const testSend = (body) => {
+const sendEmail = (body) => {
     mailgun.messages().send(makeEmail(body), (error, body) => {
       console.log('Email sent:', body);
       if (error) {
@@ -25,7 +25,7 @@ const sendListings = (user, listings) => {
   // console.log(user);
   let template = emailTemplate(listings)
   // console.log(template);
-  testSend(template);
+  sendEmail(template);
 }
 
-module.exports = { testSend, sendListings };
+module.exports = { sendListings, sendListings };

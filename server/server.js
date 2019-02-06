@@ -15,6 +15,7 @@ const { authenticate } = require('./middleware/authenticate');
 const { TEST_ITEMS } = require('./db/testdata')
 const { testSend } = require('./email/emailService')
 
+// Start the CRON Jobs
 dailyFetch.start();
 dailyDispatch.start();
 
@@ -37,18 +38,19 @@ app.use(cors(corsOptions));
 app.use(bodyParser.json());
 
 app.get('/', (req, res)  => {
-    const response = {
-        host: req.headers.host,
-        origin: req.headers.origin
-    }
-    res.send(response);
+    // const response = {
+    //     host: req.headers.host,
+    //     origin: req.headers.origin
+    // }
+    res.send('OK');
 });
 
 
 // ###### USERS ######
 
-// POST /users
+// ADD a user
 app.post('/users', (req, res) => {
+    // Filtering props in request
     let body = _.pick(req.body, ['email', 'security.question', 'security.answer']);
     let user = new User(body);
 
@@ -93,7 +95,6 @@ app.delete('/users/me/token', authenticate, (req, res) => {
 
 // GET Question
 app.get('/users/question', (req, res) => {
-    console.log(req.query);
     User.findOne({email: req.query.email})
         .then((user) => {
             if(!user) {
@@ -107,12 +108,13 @@ app.get('/users/question', (req, res) => {
         })
 })
 
-// PATCH Update WatchedItems
+// Update WatchedItems
 app.patch('/users/watcheditems', authenticate, (req, res) => {
     let body = _.pick(req.body, ['item']);
 
     if (!ObjectId.isValid(body.item._id)) {
-        res.status(404).send('Invalid id');
+        res.status(400).send('Invalid id');
+        return;
     }
 
     req.user.updateWatchedItems(body.item).then((user) => {

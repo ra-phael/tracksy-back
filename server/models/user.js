@@ -74,7 +74,9 @@ UserSchema.methods.updateWatchedItems = function(item) {
             $pull: {
                 watchedItems: { _id: item._id }
             }
-        }, {new: true}).then(user => user)
+        }, 
+        {new: true})
+        .then(user => user)
     } else {
         console.log("Adding watched item", item);
         return User.findByIdAndUpdate({
@@ -83,7 +85,9 @@ UserSchema.methods.updateWatchedItems = function(item) {
             $addToSet: {
                 watchedItems: { _id: item._id }
             }
-        }, {new: true}).then(user => user)
+        },
+         {new: true})
+        .then(user => user)
     }
 }
 
@@ -138,7 +142,7 @@ UserSchema.statics.findByCredentials = function (email, answer) {
     return User.findOne({email})
         .then((user) => {
             if(!user) {
-                return Promise.reject();
+                return Promise.reject('User not found');
             }
 
             return new Promise((resolve, reject) => {
@@ -146,7 +150,7 @@ UserSchema.statics.findByCredentials = function (email, answer) {
                     if(result === true) {
                         resolve(user);
                     } else {
-                        reject();
+                        reject('Wrong answer');
                     }
                 })
             })
