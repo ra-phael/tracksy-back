@@ -6,6 +6,8 @@ const { User } = require('../models/user');
 const { Item } = require('../models/item');
 const { sendListings } = require('../email/emailService')
 
+// Returns an object of base thresholds like
+// {love-bracelet: 2000, palm-springs-backpack: 500}
 const getBaseThresholds = () => {
     return new Promise((resolve, reject) => {
          Item.find({})
@@ -15,20 +17,43 @@ const getBaseThresholds = () => {
                     obj
                 ), {})
             ))
+            .catch(e => reject("Error building base thresholds:", e))
     })
 }
 
-const processNewListings = (newListings) => {
+const saveFreshScrape = (newListings) => {
+    // console.log('newListings:', newListings.scraped[0].listings);
     let freshScrape = new ScrapedListing(newListings);
-    freshScrape.save()
+    return freshScrape.save((err, scrape) => {
+        if(err) throw new Error("Error while saving freshScrape", err)
+        return scrape
+    })
+}
 
-    // Update lastListing in Item collection
-    newListings.scraped.forEach(item => {
-        Item.findByIdAndUpdate( item._id, { $set: { lastListing: item.lastListing }}, (err, el) => {
-            if(err) console.log("Error while updating Item", err);
+// Save fresh listings and update lastListing in Item collection
+const processNewListings = (newListings) => {
+    return new Promise ((resolve, reject) => {
+        // save it in any case for reference
+        saveFreshScrape(newListings)
+        .then(scrape => {
+            if(newListings.scraped.length == 0) {
+                reject("No new items scraped")
+            }
+            
+            newListings.scraped.forEach(item => {
+                Item.findByIdAndUpdate( item._id,
+                    { $set: { lastListing: item.lastListing }},
+                    (err, el) => {
+                        if(err) reject("Error while updating Item", err);
+                    }
+                )
+            });
+            console.log("Saved fresh listings in DB");
+            resolve(scrape);
         })
-    });
-    console.log("Saved fresh listings in DB");
+        .catch(error => reject(error))
+
+    })
 }
 
 const filterItem = (item, watchedItem, thresholds) => {
@@ -46,31 +71,41 @@ const filterItem = (item, watchedItem, thresholds) => {
     return filteredItem
 }
 
+const makeItemsToSend = (user, newScrape, baseThresholds) => {
+    let itemsToSend = [];
+                
+    newScrape.scraped.forEach(scrapedItem => {
+        let scrapedItemId = new ObjectId(scrapedItem._id)
+
+        let matchingWatchedItem = user.watchedItems
+            .filter(obj => obj._id.equals(scrapedItemId))[0];
+        // console.log("Matching item", matchingWatchedItem);
+
+        if(matchingWatchedItem) {
+            // console.log(`New ${scrapedItem.name} for ${user.email}`);
+            let filteredItem = filterItem(scrapedItem, matchingWatchedItem, baseThresholds);
+            // console.log("filteredItem:", filteredItem);
+            if(filteredItem.listings && filteredItem.listings.length) {
+                itemsToSend.push(filteredItem);
+            }
+        }
+    })
+
+    return itemsToSend
+}
+
+
 const mainConsolidator = (newScrape, baseThresholds) => {
     User.find({})
         .then(users => { 
             users.forEach(user => {
-                let itemsToSend = [];
-                
-                newScrape.scraped.forEach(item => {
-                    let itemId = new ObjectId(item._id)
+                let itemsToSend = makeItemsToSend(user, newScrape, baseThresholds);
 
-                    let matchingWatchedItem = user.watchedItems
-                    .filter(obj => obj._id.equals(itemId));
-                    matchingWatchedItem = matchingWatchedItem[0];
-                    console.log("Matching item", matchingWatchedItem);
-
-                    if(matchingWatchedItem) {
-                        // console.log(`New ${item.name} for ${user.email}`);
-                        itemsToSend.push(filterItem(item, matchingWatchedItem, baseThresholds))
-                    }
-                });
                 if(itemsToSend && itemsToSend.length) {
                     console.log("Items to send: ", itemsToSend);
                     sendListings(user, itemsToSend);
                 }
             })
-            
         })
         .catch(e => console.log("[mainConsolidator] :", e))
 }
