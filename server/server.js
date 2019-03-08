@@ -15,11 +15,17 @@ const { authenticate } = require('./middleware/authenticate')
 const { TEST_ITEMS } = require('./db/testdata')
 const { testSend } = require('./email/emailService')
 
+const app = express()
+
+// Sentry config
+const Sentry = require('@sentry/node')
+Sentry.init({ dsn: 'https://a2483fca12694608bab21826a88d5f5e@sentry.io/1411066' })
+app.use(Sentry.Handlers.requestHandler())
+app.use(Sentry.Handlers.errorHandler())
+
 // Start the CRON Jobs
 dailyFetch.start()
 dailyDispatch.start()
-
-const app = express()
 
 const corsOptions = {
   origin: function (origin, callback) {

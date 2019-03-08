@@ -1,16 +1,28 @@
+const rax = require('retry-axios')
 const axios = require('axios')
 const { Item } = require('../models/item')
 
-// const BASE_URL = 'https://tracksy-racleur.herokuapp.com';
-const BASE_URL = 'http://127.0.0.1:5000'
+const BASE_URL = 'https://tracksy-racleur.herokuapp.com'
+// const BASE_URL = 'http://127.0.0.1:5000'
 
-const instance = axios.create({
+const axiosInstance = axios.create({
   baseURL: BASE_URL,
   timeout: 5000
 })
 
+axiosInstance.defaults.raxConfig = {
+  instance: axiosInstance,
+  // Retry 3 times on requests that return a response (500, etc) before giving up.  Defaults to 3.
+  retry: 3,
+  // Retry twice on errors that don't return a response (ENOTFOUND, ETIMEDOUT, etc).
+  noResponseRetries: 2,
+  // Milliseconds to delay at first.  Defaults to 100.
+  retryDelay: 100
+}
+const interceptorId = rax.attach(axiosInstance)
+
 const pingCall = () => {
-  return instance.get('/ping')
+  return axiosInstance.get('/ping')
     .then(res => res.status)
     .catch(e => console.log('Racleur ping error:', e))
 }

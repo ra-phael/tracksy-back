@@ -1,12 +1,11 @@
+require('../config/config')
 const cron = require('cron')
 const { pingCall, fetchNewListings } = require('./racleur')
 const { ScrapedListing } = require('../models/scrapedListing')
 const { processNewListings, prepareDailyDeals } = require('./consolidator')
 
-// Triggers new scraping
-const dailyFetch = new cron.CronJob('0 30 11 * * *', () => {
-  console.log('## Running daily fetch job ###')
 
+const scrapeTrigger = () => {
   pingCall()
     .then(statusCode => {
       if (statusCode === 200) {
@@ -15,6 +14,12 @@ const dailyFetch = new cron.CronJob('0 30 11 * * *', () => {
           .catch(error => console.log('Error running CRON', error))
       }
     })
+}
+scrapeTrigger()
+// Triggers new scraping
+const dailyFetch = new cron.CronJob('0 30 11 * * *', () => {
+  console.log('## Running daily fetch job ###')
+  scrapeTrigger()
 })
 
 const emailTrigger = () => {

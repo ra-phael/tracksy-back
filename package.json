@@ -11,6 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@sentry/node": "^4.6.4",
     "axios": "^0.18.0",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.18.3",
@@ -22,6 +23,7 @@
     "mailgun-js": "^0.22.0",
     "mongodb": "^3.1.12",
     "mongoose": "^4.13.18",
+    "retry-axios": "^0.5.0",
     "validator": "^10.11.0"
   },
   "devDependencies": {
