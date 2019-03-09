@@ -1,14 +1,17 @@
 {
   "name": "tracksy-back",
   "version": "1.0.0",
-  "description": "",
+  "description": "Tracsky backend",
   "main": "index.js",
+  "engines": {
+    "node": "10.14.1"
+  },
   "scripts": {
     "start": "node server/server.js",
     "test": "export NODE_ENV=test || SET \"NODE_ENV=test\" && mocha server/**/*.test.js",
     "test-watch": "nodemon --exec \"npm test\""
   },
-  "author": "",
+  "author": "RR",
   "license": "ISC",
   "dependencies": {
     "@sentry/node": "^4.6.4",

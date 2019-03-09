@@ -12,8 +12,6 @@ const { User } = require('./models/user')
 const { Item } = require('./models/item')
 const corsWhitelist = ['http://localhost:3000', 'localhost:8080', '127.0.0.1:49987']
 const { authenticate } = require('./middleware/authenticate')
-const { TEST_ITEMS } = require('./db/testdata')
-const { testSend } = require('./email/emailService')
 
 const app = express()
 
@@ -44,10 +42,6 @@ app.use(cors(corsOptions))
 app.use(bodyParser.json())
 
 app.get('/', (req, res) => {
-  // const response = {
-  //     host: req.headers.host,
-  //     origin: req.headers.origin
-  // }
   res.send('OK')
 })
 
@@ -132,17 +126,6 @@ app.patch('/users/watcheditems', authenticate, (req, res) => {
 
 // GET /items
 app.get('/items', (req, res) => {
-  // TEST_ITEMS.forEach(item => {
-  //     let itemEl = new Item(item);
-  //     console.log("saving item");
-  //     itemEl.save();
-  // })
-
-  // let item1 = new Item(TEST_ITEMS[0]);
-  // let item2 = new Item(TEST_ITEMS[1]);
-  // item1.save();
-  // item2.save();
-
   Item.find().then(items => {
     res.send(items)
   }).catch(e => {

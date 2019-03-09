@@ -15,7 +15,7 @@ const scrapeTrigger = () => {
       }
     })
 }
-scrapeTrigger()
+
 // Triggers new scraping
 const dailyFetch = new cron.CronJob('0 30 11 * * *', () => {
   console.log('## Running daily fetch job ###')
