@@ -10,7 +10,7 @@ const ObjectId = mongoose.Types.ObjectId
 
 const { User } = require('./models/user')
 const { Item } = require('./models/item')
-const corsWhitelist = ['http://localhost:3000', 'localhost:8080', '127.0.0.1:49987']
+const corsWhitelist = ['http://localhost:3000', 'localhost:8080', '127.0.0.1:49987', 'https://tracksy.netlify.com']
 const { authenticate } = require('./middleware/authenticate')
 
 const app = express()
