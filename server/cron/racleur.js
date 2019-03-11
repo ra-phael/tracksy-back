@@ -1,4 +1,3 @@
-const rax = require('retry-axios')
 const axios = require('axios')
 const { Item } = require('../models/item')
 
@@ -10,21 +9,10 @@ const axiosInstance = axios.create({
   timeout: 5000
 })
 
-axiosInstance.defaults.raxConfig = {
-  instance: axiosInstance,
-  // Retry 3 times on requests that return a response (500, etc) before giving up.  Defaults to 3.
-  retry: 3,
-  // Retry twice on errors that don't return a response (ENOTFOUND, ETIMEDOUT, etc).
-  noResponseRetries: 2,
-  // Milliseconds to delay at first.  Defaults to 100.
-  retryDelay: 100
-}
-const interceptorId = rax.attach(axiosInstance)
-
 const pingCall = () => {
   return axiosInstance.get('/ping')
     .then(res => res.status)
-    .catch(e => console.error('Racleur ping error:', e))
+    .catch(e => { throw e })
 }
 
 const fetchNewListings = () => {

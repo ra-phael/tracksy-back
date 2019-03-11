@@ -26,7 +26,6 @@
     "mailgun-js": "^0.22.0",
     "mongodb": "^3.1.12",
     "mongoose": "^4.13.18",
-    "retry-axios": "^0.5.0",
     "validator": "^10.11.0"
   },
   "devDependencies": {

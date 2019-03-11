@@ -5,15 +5,32 @@ const { ScrapedListing } = require('../models/scrapedListing')
 const { processNewListings, prepareDailyDeals } = require('./consolidator')
 
 
-const scrapeTrigger = () => {
-  pingCall()
-    .then(statusCode => {
-      if (statusCode === 200) {
-        fetchNewListings()
-          .then(data => processNewListings(data))
-          .catch(error => console.error('Error running CRON', error))
+
+const fetchRetry = async (fn, n) => {
+  for (let i = 0; i < n; i++) {
+    try {
+      let code = await fn()
+      if (code === 200) {
+        return code
       }
-    })
+    } catch (err) {
+      const isLastAttempt = i + 1 === n
+      if (isLastAttempt) throw err
+    }
+  }
+}
+
+
+const scrapeTrigger = async () => {
+  try {
+    const code = await fetchRetry(pingCall, 5)
+    if (code === 200) {
+      fetchNewListings()
+        .then(data => processNewListings(data))
+    }
+  } catch (err) {
+    console.error('Error waking scraper:', err)
+  }
 }
 
 // Triggers new scraping
