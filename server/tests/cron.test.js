@@ -4,7 +4,7 @@ const cron = rewire('../cron/cron')
 const emailTrigger = cron.__get__('emailTrigger')
 
 describe('dailyDispatch - Triggers email sending', () => {
-  it.only('should not move forward with scraped listings older than today', async () => {
+  it('should not move forward with scraped listings older than today', async () => {
     try {
       await emailTrigger()
     } catch (e) {

@@ -64,9 +64,10 @@ UserSchema.methods.toJSON = function () {
 
 UserSchema.methods.updateWatchedItems = function (item) {
   let user = this
-  let itemIndex = _.find(user.watchedItems, el => el._id === item._id)
+  // let itemIndex = _.find(user.watchedItems, el => el._id === item._id)
+  let itemArray = user.get('watchedItems').filter(el => el._id.equals(item._id))
 
-  if (itemIndex !== undefined) {
+  if (typeof itemArray !== 'undefined' && itemArray.length > 0) {
     console.log('Removing already watched item', item)
     return User.findByIdAndUpdate({
       _id: user._id
