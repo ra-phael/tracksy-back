@@ -4,7 +4,6 @@ const expect = require('expect')
 const { ObjectID } = require('mongodb')
 const rewire = require('rewire')
 
-const { User } = require('./../models/user')
 const { Item } = require('./../models/item')
 const { ScrapedListing } = require('./../models/scrapedListing')
 const { users, populateUsers, populateNewScrape, populateItems, rawNewScrape } = require('./seed/seed')

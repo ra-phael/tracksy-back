@@ -40,7 +40,6 @@ const processNewListings = (newListings) => {
 
     saveFreshScrape(newListings)
       .then(scrape => {
-
         newListings.scraped.forEach(item => {
           Item.findByIdAndUpdate(item._id,
             { $set: { lastListing: item.lastListing } },

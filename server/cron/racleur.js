@@ -48,7 +48,7 @@ const fetchNewListings = () => {
       }
       console.info('Items to fetch before call', itemsToFetch)
       return new Promise((resolve, reject) => {
-        instance.post('/listings', itemsToFetch)
+        axiosInstance.post('/listings', itemsToFetch)
           .then(res => {
             resolve(res.data)
           })
