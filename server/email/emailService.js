@@ -14,9 +14,8 @@ const makeEmail = (body) => ({
 
 const sendEmail = (body) => {
   mailgun.messages().send(makeEmail(body), (error, body) => {
-    console.log('Email sent:', body)
     if (error) {
-      console.log('Error while sending email:', error)
+      console.error('Error while sending email:', error)
     }
   })
 }

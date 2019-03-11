@@ -1,6 +1,6 @@
 
 const makeItems = (items) => {
-  console.log('[makeItems]', items)
+  console.info('[makeItems]', items)
   let result = `${items.map(item => itemEl(item)).join('')}`
   return result
 }

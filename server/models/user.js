@@ -68,7 +68,7 @@ UserSchema.methods.updateWatchedItems = function (item) {
   let itemArray = user.get('watchedItems').filter(el => el._id.equals(item._id))
 
   if (typeof itemArray !== 'undefined' && itemArray.length > 0) {
-    console.log('Removing already watched item', item)
+    console.info('Removing already watched item', item)
     return User.findByIdAndUpdate({
       _id: user._id
     }, {
@@ -79,7 +79,7 @@ UserSchema.methods.updateWatchedItems = function (item) {
     { new: true })
       .then(user => user)
   } else {
-    console.log('Adding watched item', item)
+    console.info('Adding watched item', item)
     return User.findByIdAndUpdate({
       _id: user._id
     }, {

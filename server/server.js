@@ -82,7 +82,6 @@ app.post('/users/login', (req, res) => {
 
 // LOG OUT
 app.delete('/users/me/token', authenticate, (req, res) => {
-  console.log('removing token', req.token)
   req.user.removeToken(req.token).then(() => {
     res.status(200).send()
   }, () => {
@@ -115,7 +114,6 @@ app.patch('/users/watcheditems', authenticate, (req, res) => {
   }
 
   req.user.updateWatchedItems(body.item).then((user) => {
-    console.log('user after update', user)
     res.status(200).send(user)
   }, () => {
     res.status(400).send('An error occured while trying to update watched items')

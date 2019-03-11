@@ -49,7 +49,7 @@ const processNewListings = (newListings) => {
             }
           )
         })
-        console.log('Saved fresh listings in DB')
+        console.info('Saved fresh listings in DB')
         resolve(scrape)
       })
       .catch(error => {
@@ -103,17 +103,16 @@ const mainConsolidator = (newScrape, baseThresholds) => {
         let itemsToSend = makeItemsToSend(user, newScrape, baseThresholds)
 
         if (itemsToSend && itemsToSend.length) {
-          console.log('Items to send: ', itemsToSend)
+          console.info('Items to send: ', itemsToSend)
           sendListings(user, itemsToSend)
         }
       })
     })
-    .catch(e => console.log('[mainConsolidator] :', e))
+    .catch(e => console.error('[mainConsolidator] :', e))
 }
 
 const prepareDailyDeals = (newScrape) => {
   getBaseThresholds().then(baseThresholds => {
-    console.log('thresholds:', baseThresholds)
     mainConsolidator(newScrape, baseThresholds)
   })
 }

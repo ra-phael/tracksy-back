@@ -24,15 +24,15 @@ const interceptorId = rax.attach(axiosInstance)
 const pingCall = () => {
   return axiosInstance.get('/ping')
     .then(res => res.status)
-    .catch(e => console.log('Racleur ping error:', e))
+    .catch(e => console.error('Racleur ping error:', e))
 }
 
 const fetchNewListings = () => {
-  console.log('## Fetching New Listings ##')
+  console.info('## Fetching New Listings ##')
 
   return Item.find({})
     .then(items => {
-      console.log('Formatting items to fetch')
+      console.info('Formatting items to fetch')
 
       let itemsToFetch = items.map(item => ({
         _id: item._id,
@@ -46,7 +46,7 @@ const fetchNewListings = () => {
       itemsToFetch = {
         items: itemsToFetch
       }
-      console.log('Items to fetch before call', itemsToFetch)
+      console.info('Items to fetch before call', itemsToFetch)
       return new Promise((resolve, reject) => {
         instance.post('/listings', itemsToFetch)
           .then(res => {

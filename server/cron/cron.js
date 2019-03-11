@@ -11,14 +11,14 @@ const scrapeTrigger = () => {
       if (statusCode === 200) {
         fetchNewListings()
           .then(data => processNewListings(data))
-          .catch(error => console.log('Error running CRON', error))
+          .catch(error => console.error('Error running CRON', error))
       }
     })
 }
 
 // Triggers new scraping
 const dailyFetch = new cron.CronJob('0 30 11 * * *', () => {
-  console.log('## Running daily fetch job ###')
+  console.info('## Running daily fetch job ###')
   scrapeTrigger()
 })
 
@@ -30,7 +30,6 @@ const emailTrigger = () => {
         // console.log('Latest scrape:', doc)
         if (err) reject(err)
         if (doc.timeStamp.slice(0, 10) !== new Date().toISOString().slice(0, 10)) {
-          console.log('Last scraped listing is older than today')
           reject(new Error('Last scraped listing is older than today'))
         } else {
           prepareDailyDeals(doc)
@@ -42,7 +41,7 @@ const emailTrigger = () => {
 
 // Triggers email preparation and sending
 const dailyDispatch = new cron.CronJob('0 45 11 * * *', () => {
-  console.log('## Running daily dispatch job ###')
+  console.info('## Running daily dispatch job ###')
   try {
     emailTrigger()
   } catch (e) {

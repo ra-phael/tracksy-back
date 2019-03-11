@@ -26,7 +26,7 @@ describe('Get Base Thresholds', () => {
         expect(typeof thresh['palms-springs-backpack']).toBe('number')
         done()
       })
-      .catch(e => console.log(e))
+      .catch(e => console.error(e))
   })
 })
 
@@ -90,7 +90,7 @@ describe('Process New Listings', () => {
           done()
         })
       })
-      .catch(error => console.log(error))
+      .catch(error => console.error(error))
   })
 })
 
@@ -114,6 +114,6 @@ describe('Make Items To Send', () => {
       const itemsToSend = makeItemsToSend(users[0], scrapedListings[0], thresholds)
       expect(itemsToSend.length).toBe(1)
       expect(itemsToSend[0].listings.length).toBe(2)
-    }).catch(error => console.log(error))
+    }).catch(error => console.error(error))
   })
 })
