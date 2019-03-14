@@ -8,13 +8,20 @@ const axiosInstance = axios.create({
   baseURL: BASE_URL,
   timeout: 5000
 })
-
+/**
+ * Ping the scraping server
+ */
 const pingCall = () => {
   return axiosInstance.get('/ping')
     .then(res => res.status)
     .catch(e => { throw e })
 }
 
+/**
+ * Get items to fetch from DB and new listings for these
+ * from the scraping server
+ * @return {Promise} New listings
+ */
 const fetchNewListings = () => {
   console.info('## Fetching New Listings ##')
 

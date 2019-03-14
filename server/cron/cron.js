@@ -4,8 +4,13 @@ const { pingCall, fetchNewListings } = require('./racleur')
 const { ScrapedListing } = require('../models/scrapedListing')
 const { processNewListings, prepareDailyDeals } = require('./consolidator')
 
-
-
+/**
+ * Try to get a 200 by calling the function passed as param
+ * n times before giving up
+ * @param {Function} fn - A function call to an API
+ * @param {number} n - The number of times to try before giving up
+ * @return {number} status code
+ */
 const fetchRetry = async (fn, n) => {
   for (let i = 0; i < n; i++) {
     try {
@@ -20,7 +25,10 @@ const fetchRetry = async (fn, n) => {
   }
 }
 
-
+/**
+ * Ping the scraper server (via fetchRetry) to wake it up
+ * and trigger the fetching of new listings
+ */
 const scrapeTrigger = async () => {
   try {
     const code = await fetchRetry(pingCall, 5)
@@ -33,12 +41,18 @@ const scrapeTrigger = async () => {
   }
 }
 
-// Triggers new scraping
+/**
+ * CRON job that triggers new scraping
+ */
 const dailyFetch = new cron.CronJob('0 30 11 * * *', () => {
   console.info('## Running daily fetch job ###')
   scrapeTrigger()
 })
 
+/**
+ * Get the last scrape and call prepareDailyDeals to send emails
+ * @return {Promise}
+ */
 const emailTrigger = () => {
   // Get the latest scrape
   return new Promise((resolve, reject) => {
@@ -56,7 +70,9 @@ const emailTrigger = () => {
   })
 }
 
-// Triggers email preparation and sending
+/**
+ * CRON Job that triggers email preparation and sending
+ */
 const dailyDispatch = new cron.CronJob('0 45 11 * * *', () => {
   console.info('## Running daily dispatch job ###')
   try {

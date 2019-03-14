@@ -41,6 +41,7 @@ app.use(cors(corsOptions))
 
 app.use(bodyParser.json())
 
+// /
 app.get('/', (req, res) => {
   res.send('OK')
 })
@@ -122,7 +123,7 @@ app.patch('/users/watcheditems', authenticate, (req, res) => {
 
 // ###### ITEMS ######
 
-// GET /items
+// GET all items registered
 app.get('/items', (req, res) => {
   Item.find().then(items => {
     res.send(items)
